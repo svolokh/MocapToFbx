@@ -8,8 +8,8 @@ class FakeOperator:
     def report():
         pass
 
-bvh_in = sys.argv[4]
-fbx_out = sys.argv[5]
+bvh_in = sys.argv[5]
+fbx_out = sys.argv[6]
 
 # remove any existing objects
 bpy.ops.object.select_all(action='SELECT')
