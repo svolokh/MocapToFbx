@@ -1,4 +1,5 @@
 import bpy
+import os
 import io_anim_bvh.import_bvh
 import io_scene_fbx.export_fbx_bin
 import bpy_extras.io_utils
@@ -9,16 +10,12 @@ class FakeOperator:
     def report():
         pass
 
-bvh_in = sys.argv[5]
-fbx_out = sys.argv[6]
+bvh_in = os.environ['BVH_IN']
+fbx_out = os.environ['FBX_OUT'] 
 
 # remove any existing objects
 bpy.ops.object.select_all(action='SELECT')
-
-kwargs = {}
-if 'confirm' in inspect.getfullargspec(bpy.ops.object.delete).args:
-    kwargs['confirm'] = False
-bpy.ops.object.delete(**kwargs)
+bpy.ops.object.delete(confirm=False)
 
 gm = bpy_extras.io_utils.axis_conversion(from_forward='-Z', from_up='Y')
 io_anim_bvh.import_bvh.load(bpy.context, bvh_in, global_matrix=gm.to_4x4())
@@ -28,6 +25,7 @@ io_scene_fbx.export_fbx_bin.save_single(FakeOperator(),
         bpy.context.scene.view_layers[0].depsgraph, 
         filepath=fbx_out, 
         context_objects=bpy.context.view_layer.objects,
+        add_leaf_bones=True,
         axis_up='Y',
         axis_forward='-Z')
 
