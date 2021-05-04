@@ -3,6 +3,7 @@ import io_anim_bvh.import_bvh
 import io_scene_fbx.export_fbx_bin
 import bpy_extras.io_utils
 import sys
+import inspect
 
 class FakeOperator:
     def report():
@@ -13,7 +14,11 @@ fbx_out = sys.argv[6]
 
 # remove any existing objects
 bpy.ops.object.select_all(action='SELECT')
-bpy.ops.object.delete(confirm=False)
+
+kwargs = {}
+if 'confirm' in inspect.getfullargspec(bpy.ops.object.delete).args:
+    kwargs['confirm'] = False
+bpy.ops.object.delete(**kwargs)
 
 gm = bpy_extras.io_utils.axis_conversion(from_forward='-Z', from_up='Y')
 io_anim_bvh.import_bvh.load(bpy.context, bvh_in, global_matrix=gm.to_4x4())
